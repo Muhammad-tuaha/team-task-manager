@@ -17,14 +17,20 @@ const tasksRoutes = require('./routes/tasks');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ── Trust Proxy ────────────────────────────────────────────────────────────────
+// MANDATORY for hosting environments like Render to securely pass cookies.
+// Tells Express it is running behind an HTTPS load balancer proxy.
+app.set('trust proxy', 1);
+
 // ── Security middleware ────────────────────────────────────────────────────────
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true, // Required for cookies/sessions
+  // Point explicitly to your live production Vercel application front-end URL
+  origin: process.env.FRONTEND_URL || 'https://team-task-manager-five-henna.vercel.app',
+  credentials: true, // Allows cross-domain session cookies to pass through
   methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
 }));
@@ -34,25 +40,27 @@ app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // ── Session setup ──────────────────────────────────────────────────────────────
+const isProduction = process.env.NODE_ENV === 'production';
+
 const sessionConfig = {
   secret: process.env.SESSION_SECRET || 'dev-secret-change-me',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    httpOnly: true,                                           // Prevent XSS access
-    secure: process.env.NODE_ENV === 'production',           // HTTPS only in production
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    httpOnly: true, // Mitigates XSS manipulation of the session token
+    secure: isProduction, // Forces cookie transport exclusively over HTTPS in production
+    sameSite: isProduction ? 'none' : 'lax', // 'none' is mandatory for cross-domain cookie syncing
     maxAge: parseInt(process.env.SESSION_MAX_AGE) || 86400000, // 24 hours
   },
 };
 
 // Use PostgreSQL session store in production; memory store in dev
-if (process.env.NODE_ENV === 'production') {
+if (isProduction) {
   const PgSession = require('connect-pg-simple')(session);
   sessionConfig.store = new PgSession({
     pool,
     tableName: 'session',
-    createTableIfMissing: false, // We create it in initializeDatabase
+    createTableIfMissing: false, // Created inside initializeDatabase
   });
 }
 
@@ -82,7 +90,7 @@ const start = async () => {
   try {
     await initializeDatabase();
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`🚀 Server running on port ${PORT}`);
       console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
     });
   } catch (err) {
@@ -93,4 +101,4 @@ const start = async () => {
 
 start();
 
-module.exports = app; // For testing
+module.exports = app;
