@@ -2,11 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 // ── Production Domain Configuration ──────────────────────────────────────────
-// Explicitly routes client-side API requests to your live Render backend
+// Force it to use your absolute live Render API URL
 axios.defaults.baseURL = 'https://team-task-manager-api-mvlu.onrender.com'; 
-
-// Crucial: Directs the browser to append session cookies to cross-origin requests
-axios.defaults.withCredentials = true; 
+axios.defaults.withCredentials = true;  
 
 const AuthContext = createContext(null);
 

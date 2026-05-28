@@ -21,7 +21,18 @@ export default function AuthForm({ isLogin }) {
       }
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.error || err.response?.data?.details?.[0] || 'Authentication failed');
+      console.error('Authentication component caught error:', err);
+
+      // Extract details cleanly, checking if nested keys are strings or objects
+      const rawError = err.response?.data?.error || err.response?.data?.details?.[0] || err.message || 'Authentication failed';
+      
+      if (typeof rawError === 'object' && rawError !== null) {
+        // If it's a Joi detail or validation object, extract the message property safely
+        setError(rawError.message || JSON.stringify(rawError));
+      } else {
+        // Otherwise, it's a clean string message (e.g. "password too short")
+        setError(String(rawError));
+      }
     } finally {
       setSubmitting(false);
     }
@@ -48,23 +59,38 @@ export default function AuthForm({ isLogin }) {
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-ink-light mb-1.5">Full Name</label>
               <input
-                type="text" required className="input-field" placeholder="John Doe"
-                value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                type="text" 
+                required 
+                className="input-field" 
+                placeholder="John Doe"
+                autoComplete="name"
+                value={formData.name} 
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
             </div>
           )}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-ink-light mb-1.5">Email Address</label>
             <input
-              type="email" required className="input-field" placeholder="you@example.com"
-              value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              type="email" 
+              required 
+              className="input-field" 
+              placeholder="you@example.com"
+              autoComplete="email"
+              value={formData.email} 
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             />
           </div>
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-ink-light mb-1.5">Password</label>
             <input
-              type="password" required className="input-field" placeholder="••••••••"
-              value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              type="password" 
+              required 
+              className="input-field" 
+              placeholder="••••••••"
+              autoComplete={isLogin ? "current-password" : "new-password"}
+              value={formData.password} 
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
           </div>
 
