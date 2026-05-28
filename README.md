@@ -24,3 +24,25 @@ A production-ready team task ecosystem built with a completely decoupled archite
 ```bash
 git clone [https://github.com/Muhammad-tuaha/team-task-manager.git](https://github.com/Muhammad-tuaha/team-task-manager.git)
 cd team-task-manager
+2. Backend Environment Config
+Navigate to the backend/ folder, create a .env file, and populate it:
+
+Code snippet
+NODE_ENV=development
+PORT=5000
+DATABASE_URL=postgres://your_user:your_password@localhost:5432/task_manager_db
+SESSION_SECRET=your_development_secret_key
+FRONTEND_URL=http://localhost:5173
+Then start the server:
+
+Bash
+cd backend
+npm install
+npm run dev
+3. Frontend App Launch
+Navigate to the frontend/ folder and boot up the Vite asset compiler pipeline:
+
+Bash
+cd ../frontend
+npm install
+npm run dev
