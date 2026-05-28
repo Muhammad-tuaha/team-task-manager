@@ -5,7 +5,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import AuthForm from './components/AuthForm';
 import Dashboard from './components/Dashboard';
 import './index.css';
-
+import axios from 'axios';
+axios.defaults.withCredentials = true; // 🪄 One global line to rule them all!
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <div className="flex h-screen items-center justify-center font-medium">Loading...</div>;
