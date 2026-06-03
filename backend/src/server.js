@@ -33,7 +33,7 @@ app.use(helmet({
    CORS (STRICT FOR VERCEL + RENDER)
 ───────────────────────────────────────────────────────────── */
 app.use(cors({
-  origin: 'https://team-task-manager-five-henna.vercel.app',
+  origin: ['https://team-task-manager-five-henna.vercel.app','https://team-task-manager-dgjoadyhi-tahasoomro10-9746s-projects.vercel.app'],
   credentials: true,
   methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
